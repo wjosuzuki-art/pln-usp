@@ -1,0 +1,15 @@
+=== GRID v2 (fold 0 de 5) -- 4.0h ===
+Erro-padrão da acurácia ~0,8 ponto: diferenças < ~1,5 ponto podem ser sorte.
+Referência: baseline TF-IDF+LogReg ~0,456
+
+g_large_lr2e-5_ep3       acc=0.4591 macro-F1=0.4577 log-loss=1.0539  (36 min)
+g_base_lr3e-5            acc=0.4578 macro-F1=0.4529 log-loss=1.0671  (15 min)
+g_legalbert              acc=0.4568 macro-F1=0.4507 log-loss=1.0568  (16 min)
+g_large_len256           acc=0.4548 macro-F1=0.4527 log-loss=1.0511  (29 min)
+g_large_lr2e-5_ep2       acc=0.4536 macro-F1=0.4502 log-loss=1.0441  (24 min)
+g_large_lr1e-5_ep4       acc=0.4528 macro-F1=0.4497 log-loss=1.0505  (48 min)
+g_large_lr1e-5_ep3       acc=0.4514 macro-F1=0.4463 log-loss=1.0525  (36 min)
+g_large_dupone           acc=0.4434 macro-F1=0.4387 log-loss=1.0598  (36 min)
+
+Vencedor: g_large_lr2e-5_ep3. Para gerar os modelos finais:
+python train_v2.py --data train.xlsx --kfold 5 --save_models --tag final --lr 2e-5 --epochs 3

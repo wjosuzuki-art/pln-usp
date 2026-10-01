@@ -1,0 +1,15 @@
+=== GRID NOVOS MODELOS (fold 0 de 5) -- 10.0h ===
+Erro-padrão da acurácia num fold só: ~0,8 ponto.
+Referências (fold 0 do grid anterior): BERTimbau-large 0,4591 | base 0,4578 | jurídico 0,4568
+Referências (5 folds): BERTimbau-large 0,4554 | jurídico 0,4558 | ensemble 3 modelos 0,4726
+
+g_norb_lr3e-5            acc=0.4581 macro-F1=0.4578 log-loss=1.0568  (44 min)
+g_norb_lr5e-5            acc=0.4581 macro-F1=0.4580 log-loss=1.0846  (44 min)
+g_alb_lora16_lr1e-4      acc=0.4524 macro-F1=0.4432 log-loss=1.0465  (155 min)
+g_alb_lora16_lr2e-4      acc=0.4519 macro-F1=0.4490 log-loss=1.0613  (154 min)
+g_norb_lr2e-5            acc=0.4471 macro-F1=0.4447 log-loss=1.0551  (44 min)
+g_norb_lr3e-5_len1024    acc=0.4461 macro-F1=0.4451 log-loss=1.0633  (58 min)
+g_alb_lora32_lr2e-4      FALHOU
+
+Vencedor: g_norb_lr3e-5. Comando dos 5 folds finais:
+train_v2.py --data train.xlsx --kfold 5 --save_models --tag final_g_norb_lr3e-5 --model Itau-Unibanco/NorBERTo-large --lr 3e-5 --batch_size 8 --grad_accum 2

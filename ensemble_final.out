@@ -1,0 +1,19 @@
+[info] calculando membro tfidf_logreg (CPU; alguns minutos)...
+
+Modelos individuais (OOF):
+  final_large_1790601626                   acc=0.4554 macro-F1=0.4525 log-loss=1.0404
+  final_legal_1790612371                   acc=0.4558 macro-F1=0.4508 log-loss=1.0466
+  final_g_norb_lr3e-5_1790685940           acc=0.4585 macro-F1=0.4576 log-loss=1.0520
+  tfidf_logreg                             acc=0.4518 macro-F1=0.4508 log-loss=1.0426
+
+Comparação dos métodos de pesos (estimativa honesta, pesos ajustados só nos outros folds):
+  mean     acc=0.4721 log-loss=1.0201
+  logloss  acc=0.4734 log-loss=1.0189
+  grid     acc=0.4701 log-loss=1.0207
+  -> escolhido: logloss
+
+Pesos do ensemble (logloss): {'final_large_1790601626': 0.36, 'final_legal_1790612371': 0.19, 'final_g_norb_lr3e-5_1790685940': 0.11, 'tfidf_logreg': 0.34}
+Ensemble (OOF): acc=0.4735 macro-F1=0.4709 log-loss=1.0188
+  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4734 log-loss=1.0189  <- é esta a que você deve esperar no teste, não o número acima
+submission (modelo): {'c5': 0.387, 'c234': 0.318, 'c1': 0.296}
+submission (dupblend, 100 duplicatas): {'c5': 0.394, 'c234': 0.317, 'c1': 0.289}
