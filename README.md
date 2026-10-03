@@ -76,8 +76,16 @@ Os demais parâmetros usam os padrões de `train_v2.py` (AdamW, warmup de 10%, w
 **2. Combinar os modelos e gerar a planilha de teste rotulada:**
 
 ```bash
-python ensemble.py --data train.xlsx --test test.xlsx --add_tfidf \
-  --runs runs_v2/final_large_* runs_v2/final_legal_* runs_v2/final_norb_* --out submission_final.xlsx
+python ensemble.py --data train.xlsx --test test.xlsx --add_tfidf --full_mode mix --runs runs_v2/final_large_* runs_v2/final_legal_* runs_v2/final_norb_* --out submission_final.xlsx
+```
+
+**2b. Treina e combina modelos com dados de toda a planilha train.xlsx:**
+
+```bash
+python train_v2.py --data train.xlsx --test test.xlsx --full --full_into runs_v2/final_large_* --tag full_large --model neuralmind/bert-large-portuguese-cased --lr 2e-5 --epochs 3 --batch_size 8 --grad_accum 2 --max_len 512
+python train_v2.py --data train.xlsx --test test.xlsx --full --full_into runs_v2/final_legal_* --tag full_legal --model felipemaiapolo/legalnlp-bert --lr 3e-5 --epochs 3 --batch_size 16 --grad_accum 1 --max_len 512
+python train_v2.py --data train.xlsx --test test.xlsx --full --full_into runs_v2/final_norb_* --tag full_norb --model Itau-Unibanco/NorBERTo-large --lr 3e-5 --epochs 3 --batch_size 8 --grad_accum 2 --max_len 512
+python ensemble.py --data train.xlsx --test test.xlsx --add_tfidf --full_mode mix --runs runs_v2/final_large_* runs_v2/final_legal_* runs_v2/final_norb_* --out submission_final.xlsx
 ```
 
 Imprime a comparação dos métodos de pesos, os pesos escolhidos e a **estimativa honesta** (47,34%). Gera `submission_final.xlsx` (a entrega) e `submission_final_dupblend.xlsx` (variante descartada, não validada).
@@ -99,13 +107,8 @@ python grid_novos.py --data train.xlsx     # NorBERTo-large e Albertina-900M com
 
 Os placares estão em `resultados/`. Como cada configuração foi avaliada em um fold só (erro-padrão de cerca de 0,8 ponto), pequenas diferenças entre elas não são conclusivas.
 
-### Opcional: modelos treinados com todas as linhas (não validado)
-
 ```bash
-python train_v2.py --data train.xlsx --test test.xlsx --full --full_into runs_v2/final_large_<timestamp> \
-  --tag full_large --model neuralmind/bert-large-portuguese-cased --lr 2e-5 --epochs 3 --batch_size 8 --grad_accum 2 --max_len 512
-# (idem para os outros dois) e depois:
-python ensemble.py ... --full_mode mix      # cada transformer = média dos 5 modelos dos folds + o completo
+
 ```
 
 Não há validação independente para esses modelos; os 47,34% referem-se aos modelos dos folds.
