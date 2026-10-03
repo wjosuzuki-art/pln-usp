@@ -1,0 +1,25 @@
+# ambiente e caches
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.cache/
+
+# resultados de treino, modelos e logs (grandes; não versionar)
+runs/
+runs_v2/
+runs_tapt/
+grid_logs/
+overnight_logs/
+*.npy
+*.safetensors
+*.bin
+*.out
+nohup.out
+
+# dados da disciplina e planilhas de entrega (não redistribuir)
+*.xlsx
+
+# mas manter os resultados resumidos
+!resultados/
+!resultados/*
