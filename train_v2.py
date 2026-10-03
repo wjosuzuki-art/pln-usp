@@ -126,6 +126,15 @@ def parse_args():
                    help="Amostra pequena, 1 época, max_len 128: só pra validar o pipeline.")
     p.add_argument("--out_dir", default="runs_v2")
     p.add_argument("--tag", default="")
+    p.add_argument("--full", action="store_true",
+                   help="Treina UM modelo com TODAS as linhas do treino (mesmos hiperparâmetros) e prevê o teste "
+                        "(precisa de --test). Não há validação independente.")
+    p.add_argument("--full_into", default=None,
+                   help="Com --full: pasta de uma rodada de 5 folds onde gravar test_probs_full.npy "
+                        "(o ensemble.py --full_mode a encontra lá).")
+    p.add_argument("--collapse_f1", type=float, default=0.25,
+                   help="Se o macro-F1 da época 1 ficar abaixo disso, o treino é considerado degenerado e "
+                        "reiniciado com outra semente (0 desliga).")
     p.add_argument("--save_models", action="store_true",
                    help="Salva o modelo de cada fold em <run_dir>/model_foldK, para prever o teste "
                         "depois com predict_v2.py sem treinar de novo. Ocupa disco: ~1,3GB por fold "
@@ -309,11 +318,13 @@ def param_groups(model, lr, wd, decay):
     return list(groups.values())
 
 
-def load_model(args, torch):
+def load_model(args, torch, amp_dtype=None):
     from transformers import AutoModelForSequenceClassification
     kw = dict(num_labels=N_CLASSES, id2label=ID2LABEL, label2id=LABEL2ID)
-    if args.lora:
-        # base congelada em bf16: metade da memória, e ela não recebe atualização
+    if args.lora and amp_dtype is not None:
+        # base congelada em bf16: metade da memória, e ela não recebe atualização.
+        # Só com autocast ligado (GPU Ampere+): ele reconcilia bf16 (base) com fp32
+        # (adaptadores e cabeça). Sem autocast (CPU, GPU antiga) a base fica em fp32.
         kw["dtype"] = torch.bfloat16
 
     def _load(**extra):
@@ -404,7 +415,7 @@ def train_fold(args, torch, tokenizer, train_seqs, soft, weights, val_seqs, y_va
     random.seed(seed)
     np.random.seed(seed)
 
-    model = load_model(args, torch).to(device)
+    model = load_model(args, torch, amp_dtype).to(device)
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
     groups = param_groups(model, args.lr, args.weight_decay, args.llrd)
     if args.optim_8bit:
@@ -469,10 +480,49 @@ def train_fold(args, torch, tokenizer, train_seqs, soft, weights, val_seqs, y_va
               f"macro-F1={m['macro_f1']:.4f} log-loss={m['log_loss']:.4f}", flush=True)
 
         # trava anti-colapso: large às vezes degenera prevendo 1 classe só
-        if epoch == 1 and m["macro_f1"] < 0.25:
+        if epoch == 1 and m["macro_f1"] < args.collapse_f1:
             return None, history, None
 
     return model, history, val_probs
+
+
+def train_full(args, torch, tokenizer, df, test_seqs, device, amp_dtype, run_dir):
+    """Treina UM modelo com todas as linhas do treino e prevê o teste.
+    ATENÇÃO: não existe validação independente aqui. As métricas 'val' impressas usam 600 linhas do
+    PRÓPRIO treino e servem só de checagem de sanidade (o modelo não degenerou)."""
+    t0 = time.time()
+    texts, soft, weights = aggregate_duplicates(df, args.dup_weight, args.label_smoothing)
+    train_seqs = encode_head_tail(tokenizer, texts, args.max_len, args.head_tokens)
+    chk = np.random.RandomState(args.seed).choice(len(df), size=min(600, len(df)), replace=False)
+    chk_seqs = encode_head_tail(tokenizer, df["text"].values[chk].tolist(), args.max_len, args.head_tokens)
+    print(f"\n===== TREINO COMPLETO | {len(df)} linhas -> {len(texts)} textos únicos =====")
+    print("  [full] as métricas 'val' abaixo são sobre linhas do PRÓPRIO treino (checagem de sanidade), "
+          "não uma validação.", flush=True)
+    model = None
+    for seed in (args.seed, args.seed + 1000):
+        model, _, _ = train_fold(args, torch, tokenizer, train_seqs, soft, weights, chk_seqs,
+                                 df["label_id"].values[chk], device, amp_dtype, seed, fold_tag="full")
+        if model is not None:
+            break
+        print("  [full] colapso detectado na época 1 -- reiniciando com outra semente...", flush=True)
+        torch.cuda.empty_cache()
+    assert model is not None, "O treino degenerou duas vezes; tente --lr menor."
+    pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
+    probs = predict_probs(torch, model, test_seqs, pad_id, args.eval_batch_size, device, amp_dtype)
+    np.save(run_dir / "test_probs_full.npy", probs)
+    if args.full_into:
+        dest = Path(args.full_into)
+        assert dest.is_dir(), f"--full_into: pasta inexistente: {dest}"
+        np.save(dest / "test_probs_full.npy", probs)
+        print(f"[full] previsões do teste gravadas em {dest / 'test_probs_full.npy'}")
+    if args.save_models:
+        if args.lora:
+            model = model.merge_and_unload()
+        model.save_pretrained(run_dir / "model_full")
+        tokenizer.save_pretrained(run_dir / "model_full")
+    dist = np.bincount(probs.argmax(1), minlength=N_CLASSES) / len(probs)
+    print(f"[full] distribuição prevista no teste: " + " | ".join(f"{l} {d:.1%}" for l, d in zip(LABELS, dist)))
+    print(f"[full] pronto em {(time.time() - t0) / 60:.1f} min | saída em {run_dir}")
 
 
 def main():
@@ -514,6 +564,11 @@ def main():
         overlap = sum(t in set(df["text"]) for t in test_texts)
         print(f"[info] teste: {len(test_texts)} linhas, {overlap} idênticas a algum texto do treino "
               f"({overlap / len(test_texts):.1%}) -> candidatas ao resgate de duplicatas")
+
+    if args.full:
+        assert args.test, "--full precisa de --test (é para prever o teste)"
+        train_full(args, torch, tokenizer, df, test_seqs, device, amp_dtype, run_dir)
+        return
 
     y_all = df["label_id"].values
     oof = np.full((len(df), N_CLASSES), np.nan, dtype=np.float32)
