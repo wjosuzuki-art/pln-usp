@@ -45,6 +45,11 @@ def parse_args():
                         "membros); logloss = ajuste suave por log-loss (serve para qualquer nº de membros, "
                         "menos sujeito a overfitting); mean = média simples; auto = grid se até 4 membros, "
                         "senão logloss.")
+    p.add_argument("--full_mode", choices=["none", "mix", "replace"], default="none",
+                   help="Usa também os modelos treinados com TODAS as linhas (test_probs_full.npy dentro de cada "
+                        "pasta de rodada, gerado pelo train_v2.py --full). mix = média de todos (os modelos dos "
+                        "folds + o completo, cada um com peso igual); replace = só o completo. Só afeta as "
+                        "previsões do teste, não a validação.")
     p.add_argument("--dup_blend_alpha", type=float, default=3.0)
     p.add_argument("--out", default="submission_ensemble.xlsx")
     p.add_argument("--tune_bias", action="store_true",
@@ -190,7 +195,17 @@ def main():
         names.append(r.name)
         oofs.append(P)
         tp = r / "test_probs_mean.npy"
-        tests.append(np.load(tp) if tp.exists() else None)
+        tm = np.load(tp) if tp.exists() else None
+        fp = r / "test_probs_full.npy"
+        if args.full_mode != "none":
+            if tm is not None and fp.exists():
+                full = np.load(fp)
+                n_f = int(o["fold"].nunique())
+                tm = full if args.full_mode == "replace" else (n_f * tm + full) / (n_f + 1)
+                print(f"[info] {r.name}: previsão do teste com o modelo completo ({args.full_mode})")
+            else:
+                print(f"[aviso] {r.name}: sem test_probs_full.npy -- usando só os modelos dos folds")
+        tests.append(tm)
 
     for flag, kind, label in ((args.add_tfidf, "word", "tfidf_logreg"), (args.add_char, "char", "tfidf_char_logreg")):
         if flag:
