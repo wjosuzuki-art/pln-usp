@@ -1,0 +1,287 @@
+=== runs_v2/final_large_1790601626
+{
+  "data": "train.xlsx",
+  "test": null,
+  "model": "neuralmind/bert-large-portuguese-cased",
+  "kfold": 5,
+  "folds": null,
+  "max_len": 512,
+  "head_tokens": 128,
+  "batch_size": 8,
+  "grad_accum": 2,
+  "eval_batch_size": 32,
+  "lr": 2e-05,
+  "epochs": 3,
+  "warmup": 0.1,
+  "weight_decay": 0.01,
+  "llrd": 0.9,
+  "label_smoothing": 0.05,
+  "dup_weight": "sqrt",
+  "dup_blend_alpha": 3.0,
+  "no_grad_ckpt": false,
+  "seed": 42,
+  "debug": false,
+  "out_dir": "runs_v2",
+  "tag": "final_large",
+  "save_models": true
+}
+{
+  "overall_oof": {
+    "accuracy": 0.45537802996366533,
+    "macro_f1": 0.45253164814431956,
+    "log_loss": 1.0403727293014526
+  },
+  "folds": [
+    {
+      "accuracy": 0.44787260512565313,
+      "macro_f1": 0.44579615847024784,
+      "log_loss": 1.0492229461669922
+    },
+    {
+      "accuracy": 0.460179193628671,
+      "macro_f1": 0.4568267233242913,
+      "log_loss": 1.0370796918869019
+    },
+    {
+      "accuracy": 0.4641612742658039,
+      "macro_f1": 0.46313311741450075,
+      "log_loss": 1.0456950664520264
+    },
+    {
+      "accuracy": 0.4554504728720757,
+      "macro_f1": 0.4500755150835702,
+      "log_loss": 1.0314874649047852
+    },
+    {
+      "accuracy": 0.4492284718765555,
+      "macro_f1": 0.443636317087339,
+      "log_loss": 1.0383766889572144
+    }
+  ],
+  "minutes": 178.84790555238723,
+  "rows_covered": 20091
+}
+=== runs_v2/final_legal_1790612371
+{
+  "data": "train.xlsx",
+  "test": null,
+  "model": "felipemaiapolo/legalnlp-bert",
+  "kfold": 5,
+  "folds": null,
+  "max_len": 512,
+  "head_tokens": 128,
+  "batch_size": 16,
+  "grad_accum": 1,
+  "eval_batch_size": 32,
+  "lr": 3e-05,
+  "epochs": 3,
+  "warmup": 0.1,
+  "weight_decay": 0.01,
+  "llrd": 0.9,
+  "label_smoothing": 0.05,
+  "dup_weight": "sqrt",
+  "dup_blend_alpha": 3.0,
+  "no_grad_ckpt": false,
+  "seed": 42,
+  "debug": false,
+  "out_dir": "runs_v2",
+  "tag": "final_legal",
+  "save_models": true
+}
+{
+  "overall_oof": {
+    "accuracy": 0.4557762182071574,
+    "macro_f1": 0.4507578730110957,
+    "log_loss": 1.0466197729110718
+  },
+  "folds": [
+    {
+      "accuracy": 0.45633242100024884,
+      "macro_f1": 0.45025004655876294,
+      "log_loss": 1.056764841079712
+    },
+    {
+      "accuracy": 0.4646590343454455,
+      "macro_f1": 0.46217958631065387,
+      "log_loss": 1.0401309728622437
+    },
+    {
+      "accuracy": 0.44798407167745147,
+      "macro_f1": 0.4403266536713928,
+      "log_loss": 1.0526715517044067
+    },
+    {
+      "accuracy": 0.4576903932304629,
+      "macro_f1": 0.44725466857524215,
+      "log_loss": 1.0391117334365845
+    },
+    {
+      "accuracy": 0.4522150323544052,
+      "macro_f1": 0.4500249443149162,
+      "log_loss": 1.0444166660308838
+    }
+  ],
+  "minutes": 55.5285526394844,
+  "rows_covered": 20091
+}
+=== runs_v2/final_g_norb_lr3e-5_1790685940
+{
+  "data": "train.xlsx",
+  "test": "test.xlsx",
+  "model": "Itau-Unibanco/NorBERTo-large",
+  "kfold": 5,
+  "folds": null,
+  "max_len": 512,
+  "head_tokens": 128,
+  "batch_size": 8,
+  "grad_accum": 2,
+  "eval_batch_size": 32,
+  "lr": 3e-05,
+  "epochs": 3,
+  "warmup": 0.1,
+  "weight_decay": 0.01,
+  "llrd": 0.9,
+  "label_smoothing": 0.05,
+  "dup_weight": "sqrt",
+  "dup_blend_alpha": 3.0,
+  "no_grad_ckpt": false,
+  "seed": 42,
+  "optim_8bit": false,
+  "lora": false,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.1,
+  "debug": false,
+  "out_dir": "runs_v2",
+  "tag": "final_g_norb_lr3e-5",
+  "save_models": true
+}
+{
+  "overall_oof": {
+    "accuracy": 0.4585137623811657,
+    "macro_f1": 0.45758594843647393,
+    "log_loss": 1.0519909858703613
+  },
+  "folds": [
+    {
+      "accuracy": 0.4575765115700423,
+      "macro_f1": 0.4570075724609158,
+      "log_loss": 1.056171178817749
+    },
+    {
+      "accuracy": 0.4651567944250871,
+      "macro_f1": 0.4634875500326529,
+      "log_loss": 1.0462844371795654
+    },
+    {
+      "accuracy": 0.4609258337481334,
+      "macro_f1": 0.4602424924175399,
+      "log_loss": 1.0544708967208862
+    },
+    {
+      "accuracy": 0.45569935291189645,
+      "macro_f1": 0.4538475064856345,
+      "log_loss": 1.0496501922607422
+    },
+    {
+      "accuracy": 0.4532105525136884,
+      "macro_f1": 0.45252838717405647,
+      "log_loss": 1.053377389907837
+    }
+  ],
+  "minutes": 218.46526667277018,
+  "rows_covered": 20091,
+  "test": {
+    "dist_model": {
+      "c5": 0.383,
+      "c234": 0.338,
+      "c1": 0.279
+    },
+    "dist_dupblend": {
+      "c5": 0.389,
+      "c234": 0.332,
+      "c1": 0.279
+    },
+    "dup_hits": 100,
+    "labels_changed_by_blend": 42
+  }
+}
+=== VERSOES
+python 3.12.3
+torch 2.14.0+cu126
+transformers 5.17.0
+scikit-learn 1.9.1
+pandas 3.0.6
+numpy 2.5.3
+scipy 1.18.1
+accelerate               1.15.0
+datasets                 5.0.1
+openpyxl                 3.1.5
+peft                     0.21.0
+sentence-transformers    6.1.0
+setfit                   1.2.0
+=== GRID BERTIMBAU/JURIDICO/BASE
+=== GRID v2 (fold 0 de 5) -- 4.0h ===
+Erro-padrão da acurácia ~0,8 ponto: diferenças < ~1,5 ponto podem ser sorte.
+Referência: baseline TF-IDF+LogReg ~0,456
+
+g_large_lr2e-5_ep3       acc=0.4591 macro-F1=0.4577 log-loss=1.0539  (36 min)
+g_base_lr3e-5            acc=0.4578 macro-F1=0.4529 log-loss=1.0671  (15 min)
+g_legalbert              acc=0.4568 macro-F1=0.4507 log-loss=1.0568  (16 min)
+g_large_len256           acc=0.4548 macro-F1=0.4527 log-loss=1.0511  (29 min)
+g_large_lr2e-5_ep2       acc=0.4536 macro-F1=0.4502 log-loss=1.0441  (24 min)
+g_large_lr1e-5_ep4       acc=0.4528 macro-F1=0.4497 log-loss=1.0505  (48 min)
+g_large_lr1e-5_ep3       acc=0.4514 macro-F1=0.4463 log-loss=1.0525  (36 min)
+g_large_dupone           acc=0.4434 macro-F1=0.4387 log-loss=1.0598  (36 min)
+
+Vencedor: g_large_lr2e-5_ep3. Para gerar os modelos finais:
+python train_v2.py --data train.xlsx --kfold 5 --save_models --tag final --lr 2e-5 --epochs 3=== GRID NOVOS MODELOS
+=== GRID NOVOS MODELOS (fold 0 de 5) -- 10.0h ===
+Erro-padrão da acurácia num fold só: ~0,8 ponto.
+Referências (fold 0 do grid anterior): BERTimbau-large 0,4591 | base 0,4578 | jurídico 0,4568
+Referências (5 folds): BERTimbau-large 0,4554 | jurídico 0,4558 | ensemble 3 modelos 0,4726
+
+g_norb_lr3e-5            acc=0.4581 macro-F1=0.4578 log-loss=1.0568  (44 min)
+g_norb_lr5e-5            acc=0.4581 macro-F1=0.4580 log-loss=1.0846  (44 min)
+g_alb_lora16_lr1e-4      acc=0.4524 macro-F1=0.4432 log-loss=1.0465  (155 min)
+g_alb_lora16_lr2e-4      acc=0.4519 macro-F1=0.4490 log-loss=1.0613  (154 min)
+g_norb_lr2e-5            acc=0.4471 macro-F1=0.4447 log-loss=1.0551  (44 min)
+g_norb_lr3e-5_len1024    acc=0.4461 macro-F1=0.4451 log-loss=1.0633  (58 min)
+g_alb_lora32_lr2e-4      FALHOU
+
+Vencedor: g_norb_lr3e-5. Comando dos 5 folds finais:
+train_v2.py --data train.xlsx --kfold 5 --save_models --tag final_g_norb_lr3e-5 --model Itau-Unibanco/NorBERTo-large --lr 3e-5 --batch_size 8 --grad_accum 2=== ENSEMBLE FINAL
+[info] calculando membro tfidf_logreg (CPU; alguns minutos)...
+
+Modelos individuais (OOF):
+  final_large_1790601626                   acc=0.4554 macro-F1=0.4525 log-loss=1.0404
+  final_legal_1790612371                   acc=0.4558 macro-F1=0.4508 log-loss=1.0466
+  final_g_norb_lr3e-5_1790685940           acc=0.4585 macro-F1=0.4576 log-loss=1.0520
+  tfidf_logreg                             acc=0.4518 macro-F1=0.4508 log-loss=1.0426
+
+Comparação dos métodos de pesos (estimativa honesta, pesos ajustados só nos outros folds):
+  mean     acc=0.4721 log-loss=1.0201
+  logloss  acc=0.4734 log-loss=1.0189
+  grid     acc=0.4701 log-loss=1.0207
+  -> escolhido: logloss
+
+Pesos do ensemble (logloss): {'final_large_1790601626': 0.36, 'final_legal_1790612371': 0.19, 'final_g_norb_lr3e-5_1790685940': 0.11, 'tfidf_logreg': 0.34}
+Ensemble (OOF): acc=0.4735 macro-F1=0.4709 log-loss=1.0188
+  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4734 log-loss=1.0189  <- é esta a que você deve esperar no teste, não o número acima
+submission (modelo): {'c5': 0.387, 'c234': 0.318, 'c1': 0.296}
+submission (dupblend, 100 duplicatas): {'c5': 0.394, 'c234': 0.317, 'c1': 0.289}
+=== COMPARACOES
+cmp_a_sem_norb.out:  mean     acc=0.4709 log-loss=1.0198
+cmp_a_sem_norb.out:  logloss  acc=0.4712 log-loss=1.0193
+cmp_a_sem_norb.out:  grid     acc=0.4707 log-loss=1.0203
+cmp_a_sem_norb.out:  -> escolhido: logloss
+cmp_a_sem_norb.out:  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4712 log-loss=1.0193  <- é esta a que você deve esperar no teste, não o número acima
+cmp_b_com_norb.out:  mean     acc=0.4721 log-loss=1.0201
+cmp_b_com_norb.out:  logloss  acc=0.4734 log-loss=1.0189
+cmp_b_com_norb.out:  grid     acc=0.4701 log-loss=1.0207
+cmp_b_com_norb.out:  -> escolhido: logloss
+cmp_b_com_norb.out:  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4734 log-loss=1.0189  <- é esta a que você deve esperar no teste, não o número acima
+cmp_c_com_norb_char.out:  mean     acc=0.4706 log-loss=1.0190
+cmp_c_com_norb_char.out:  logloss  acc=0.4708 log-loss=1.0182
+cmp_c_com_norb_char.out:  -> escolhido: logloss
+cmp_c_com_norb_char.out:  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4708 log-loss=1.0182  <- é esta a que você deve esperar no teste, não o número acima

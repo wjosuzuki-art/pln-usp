@@ -280,9 +280,11 @@ def main():
         if args.tune_bias:  # aplica os vieses convertendo de volta para probabilidades
             L = np.log(np.clip(T, 1e-7, 1)); L[:, 0] += bias[0]; L[:, 2] += bias[1]
             T = np.exp(L) / np.exp(L).sum(1, keepdims=True)
+        np.save(args.out.replace(".xlsx", "_probs.npy"), T)     # probabilidades do ensemble (usadas pelo llm_consenso.py)
         print("submission (modelo):", write_submission(args.test, T, args.out))
         Tb, hits = dup_blend(test_texts, df, T, args.dup_blend_alpha)
         out_b = args.out.replace(".xlsx", "_dupblend.xlsx")
+        np.save(out_b.replace(".xlsx", "_probs.npy"), Tb)
         print(f"submission (dupblend, {hits} duplicatas):", write_submission(args.test, Tb, out_b))
 
 

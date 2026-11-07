@@ -1,0 +1,116 @@
+=== ABLAÇÃO | 20091 linhas | 11 membros: BERTimbau, LegalNLP, NorBERTo, HAN, kNN-tfidf, kNN-grid, NB-tfidf, HGB-stats, kNN-emb, LR-emb, TF-IDF ===
+Estimativa aninhada: pesos por log-loss ajustados só nos outros folds. Erro-padrão de uma acurácia ~46% com 20 mil linhas: ~0,35 ponto.
+
+1. CADA MEMBRO SOZINHO
+   BERTimbau        acc= 45.54%  log-loss=1.0404
+   LegalNLP         acc= 45.58%  log-loss=1.0466
+   NorBERTo         acc= 45.85%  log-loss=1.0520
+   HAN              acc= 42.79%  log-loss=1.4570
+   kNN-tfidf        acc= 43.58%  log-loss=1.0571
+   kNN-grid         acc= 42.94%  log-loss=1.1172
+   NB-tfidf         acc= 44.43%  log-loss=1.2940
+   HGB-stats        acc= 43.63%  log-loss=1.0494
+   kNN-emb          acc= 43.03%  log-loss=1.0612
+   LR-emb           acc= 42.66%  log-loss=1.0840
+   TF-IDF           acc= 45.18%  log-loss=1.0426
+
+2. ENSEMBLE COM TODOS: acc=47.21%  log-loss=1.0174
+
+3. LEAVE-ONE-OUT (ensemble sem o membro; 'perda' > 0 = o membro ajuda)
+   sem                  acc  log-loss   perda de acurácia vs todos [IC 95%]
+   BERTimbau         47.03%    1.0218   +0.18 [-0.20, +0.61]
+   LegalNLP          46.82%    1.0182   +0.39 [+0.08, +0.71] *
+   NorBERTo          47.18%    1.0176   +0.03 [-0.18, +0.26]
+   HAN               47.22%    1.0179   -0.00 [-0.27, +0.25]
+   kNN-tfidf         47.30%    1.0173   -0.09 [-0.21, +0.02]
+   kNN-grid          47.28%    1.0175   -0.07 [-0.27, +0.13]
+   NB-tfidf          47.22%    1.0174   -0.00 [-0.04, +0.03]
+   HGB-stats         47.25%    1.0175   -0.04 [-0.20, +0.12]
+   kNN-emb           47.31%    1.0174   -0.10 [-0.19, -0.01]
+   LR-emb            47.31%    1.0173   -0.10 [-0.22, +0.02]
+   TF-IDF            47.31%    1.0178   -0.10 [-0.35, +0.15]
+
+4. ADICIONAR UM AO NÚCLEO (BERTimbau, LegalNLP, NorBERTo, TF-IDF)
+   núcleo sozinho: acc=47.34%  log-loss=1.0189
+   + HAN            acc= 47.22%  log-loss=1.0185   -0.12 [-0.35, +0.10]
+   + kNN-tfidf      acc= 47.25%  log-loss=1.0181   -0.09 [-0.34, +0.14]
+   + kNN-grid       acc= 47.23%  log-loss=1.0180   -0.12 [-0.41, +0.18]
+   + NB-tfidf       acc= 47.33%  log-loss=1.0189   -0.01 [-0.03, +0.00]
+   + HGB-stats      acc= 47.22%  log-loss=1.0184   -0.13 [-0.35, +0.08]
+   + kNN-emb        acc= 47.28%  log-loss=1.0184   -0.06 [-0.28, +0.14]
+   + LR-emb         acc= 47.27%  log-loss=1.0189   -0.07 [-0.23, +0.09]
+
+5. SELEÇÃO PROGRESSIVA (critério: log-loss aninhada; otimista, pois escolhe nos mesmos dados)
+   passo 1: + BERTimbau      acc= 45.54%  log-loss=1.0404
+   passo 2: + TF-IDF         acc= 46.62%  log-loss=1.0215
+   passo 3: + LegalNLP       acc= 47.12%  log-loss=1.0193
+   passo 4: + kNN-grid       acc= 46.93%  log-loss=1.0183
+   passo 5: + HAN            acc= 47.12%  log-loss=1.0179
+   passo 6: + HGB-stats      acc= 47.20%  log-loss=1.0175
+   passo 7: + NorBERTo       acc= 47.32%  log-loss=1.0173
+   passo 8: + kNN-emb        acc= 47.39%  log-loss=1.0172
+   passo 9: + NB-tfidf       acc= 47.37%  log-loss=1.0172
+   passo 10: + LR-emb         acc= 47.30%  log-loss=1.0173
+   passo 11: + kNN-tfidf      acc= 47.21%  log-loss=1.0174
+   menor log-loss com 9 membro(s): BERTimbau, TF-IDF, LegalNLP, kNN-grid, HAN, HGB-stats, NorBERTo, kNN-emb, NB-tfidf
+
+6. CONCORDÂNCIA PAR A PAR DAS PREVISÕES E ORÁCULO
+   BERTimbau      x LegalNLP        66.1%
+   BERTimbau      x NorBERTo        71.0%
+   BERTimbau      x HAN             52.4%
+   BERTimbau      x kNN-tfidf       58.4%
+   BERTimbau      x kNN-grid        54.4%
+   BERTimbau      x NB-tfidf        63.6%
+   BERTimbau      x HGB-stats       62.0%
+   BERTimbau      x kNN-emb         57.5%
+   BERTimbau      x LR-emb          58.3%
+   BERTimbau      x TF-IDF          63.5%
+   LegalNLP       x NorBERTo        67.7%
+   LegalNLP       x HAN             53.2%
+   LegalNLP       x kNN-tfidf       56.6%
+   LegalNLP       x kNN-grid        53.1%
+   LegalNLP       x NB-tfidf        62.2%
+   LegalNLP       x HGB-stats       62.8%
+   LegalNLP       x kNN-emb         57.2%
+   LegalNLP       x LR-emb          58.3%
+   LegalNLP       x TF-IDF          61.9%
+   NorBERTo       x HAN             53.8%
+   NorBERTo       x kNN-tfidf       59.7%
+   NorBERTo       x kNN-grid        55.1%
+   NorBERTo       x NB-tfidf        64.0%
+   NorBERTo       x HGB-stats       62.6%
+   NorBERTo       x kNN-emb         58.9%
+   NorBERTo       x LR-emb          60.2%
+   NorBERTo       x TF-IDF          66.0%
+   HAN            x kNN-tfidf       55.8%
+   HAN            x kNN-grid        55.9%
+   HAN            x NB-tfidf        57.3%
+   HAN            x HGB-stats       50.9%
+   HAN            x kNN-emb         50.6%
+   HAN            x LR-emb          49.3%
+   HAN            x TF-IDF          63.8%
+   kNN-tfidf      x kNN-grid        74.1%
+   kNN-tfidf      x NB-tfidf        72.9%
+   kNN-tfidf      x HGB-stats       62.5%
+   kNN-tfidf      x kNN-emb         64.1%
+   kNN-tfidf      x LR-emb          53.3%
+   kNN-tfidf      x TF-IDF          70.0%
+   kNN-grid       x NB-tfidf        65.1%
+   kNN-grid       x HGB-stats       56.6%
+   kNN-grid       x kNN-emb         58.5%
+   kNN-grid       x LR-emb          49.7%
+   kNN-grid       x TF-IDF          62.9%
+   NB-tfidf       x HGB-stats       68.2%
+   NB-tfidf       x kNN-emb         64.2%
+   NB-tfidf       x LR-emb          58.7%
+   NB-tfidf       x TF-IDF          73.5%
+   HGB-stats      x kNN-emb         61.2%
+   HGB-stats      x LR-emb          56.7%
+   HGB-stats      x TF-IDF          63.4%
+   kNN-emb        x LR-emb          55.5%
+   kNN-emb        x TF-IDF          61.0%
+   LR-emb         x TF-IDF          58.3%
+   oráculo (pelo menos um acerta): 84.8% | todos acertam: 8.9%
+
+7. COMANDO PARA O MELHOR CONJUNTO (confira com a leitura dos itens 3 e 4, não só com o 5):
+   python ensemble.py --data train.xlsx --test test.xlsx --add_tfidf --runs runs_v2/final_large_1790601626 runs_v2/final_legal_1790612371 runs_v2/X_knn_grid_1793848156 runs_v2/HAN_1793849041 runs_v2/X_hgb_stats_1793848282 runs_v2/final_g_norb_lr3e-5_1790685940 runs_v2/X_knn_emb_1793848943 runs_v2/X_nb_tfidf_1793848195 --out ens_ablacao.xlsx

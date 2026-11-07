@@ -1,0 +1,22 @@
+test1: 900 linhas | c1 33.3% c234 33.3% c5 33.3%
+erro-padrão de uma acurácia ~50% com 900 textos: ~1.7 ponto
+
+ 51.00%                   ens_ablacao.xlsx
+ 50.78%                   ens_ablacao_dupblend.xlsx
+ 50.33%  log-loss 0.9967  final_large_1790601626/mean
+ 50.00%                   ens_core_t1_dupblend.xlsx
+ 50.00%                   ens_core_t1.xlsx
+ 49.22%  log-loss 1.0140  final_large_1790601626/full
+ 48.78%  log-loss 1.0217  final_g_norb_lr3e-5_1790685940/dupblend
+ 48.22%  log-loss 1.0265  final_g_norb_lr3e-5_1790685940/mean
+ 47.56%  log-loss 1.0251  final_g_norb_lr3e-5_1790685940/full
+ 47.56%  log-loss 1.0279  final_legal_1790612371/full
+ 47.44%  log-loss 1.0203  X_knn_tfidf_1793848105/mean
+ 47.22%  log-loss 1.1781  X_nb_tfidf_1793848195/mean
+ 47.00%  log-loss 1.0225  final_legal_1790612371/mean
+ 46.33%  log-loss 1.0383  X_knn_emb_1793848943/mean
+ 45.67%  log-loss 1.0385  X_hgb_stats_1793848282/mean
+ 45.33%  log-loss 1.0586  X_knn_grid_1793848156/mean
+ 45.33%  log-loss 1.2017  HAN_1793849041/mean
+ 44.78%  log-loss 1.0438  X_lr_emb_1793849017/mean
+ 33.33%  log-loss 1.0986  HAN_1793849024/mean

@@ -1,0 +1,112 @@
+nohup: ignorando entrada
+=== [0] conferindo ===
+=== [1] guarda/restaura as previsões do test1 ===
+=== [2] ensemble de 4 membros no test1 ===
+[info] calculando membro tfidf_logreg (CPU; alguns minutos)...
+
+Modelos individuais (OOF):
+  final_large_1790601626                   acc=0.4554 macro-F1=0.4525 log-loss=1.0404
+  final_legal_1790612371                   acc=0.4558 macro-F1=0.4508 log-loss=1.0466
+  final_g_norb_lr3e-5_1790685940           acc=0.4585 macro-F1=0.4576 log-loss=1.0520
+  tfidf_logreg                             acc=0.4518 macro-F1=0.4508 log-loss=1.0426
+
+Comparação dos métodos de pesos (estimativa honesta, pesos ajustados só nos outros folds):
+  mean     acc=0.4721 log-loss=1.0201
+  logloss  acc=0.4734 log-loss=1.0189
+  grid     acc=0.4701 log-loss=1.0207
+  -> escolhido: logloss
+
+Pesos do ensemble (logloss): {'final_large_1790601626': 0.36, 'final_legal_1790612371': 0.19, 'final_g_norb_lr3e-5_1790685940': 0.11, 'tfidf_logreg': 0.34}
+Ensemble (OOF): acc=0.4735 macro-F1=0.4709 log-loss=1.0188
+  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4734 log-loss=1.0189  <- é esta a que você deve esperar no teste, não o número acima
+submission (modelo): {'c5': 0.387, 'c234': 0.318, 'c1': 0.296}
+submission (dupblend, 100 duplicatas): {'c5': 0.394, 'c234': 0.317, 'c1': 0.289}
+=== [3] acurácia no test1 (só modelos treinados SEM o test1) ===
+test1: 900 linhas | c1 33.3% c234 33.3% c5 33.3%
+erro-padrão de uma acurácia ~50% com 900 textos: ~1.7 ponto
+
+ 51.00%                   ens_ablacao.xlsx
+ 50.78%                   ens_ablacao_dupblend.xlsx
+ 50.33%  log-loss 0.9967  final_large_1790601626/mean
+ 50.00%                   ens_core_t1_dupblend.xlsx
+ 50.00%                   ens_core_t1.xlsx
+ 49.22%  log-loss 1.0140  final_large_1790601626/full
+ 48.78%  log-loss 1.0217  final_g_norb_lr3e-5_1790685940/dupblend
+ 48.22%  log-loss 1.0265  final_g_norb_lr3e-5_1790685940/mean
+ 47.56%  log-loss 1.0251  final_g_norb_lr3e-5_1790685940/full
+ 47.56%  log-loss 1.0279  final_legal_1790612371/full
+ 47.44%  log-loss 1.0203  X_knn_tfidf_1793848105/mean
+ 47.22%  log-loss 1.1781  X_nb_tfidf_1793848195/mean
+ 47.00%  log-loss 1.0225  final_legal_1790612371/mean
+ 46.33%  log-loss 1.0383  X_knn_emb_1793848943/mean
+ 45.67%  log-loss 1.0385  X_hgb_stats_1793848282/mean
+ 45.33%  log-loss 1.0586  X_knn_grid_1793848156/mean
+ 45.33%  log-loss 1.2017  HAN_1793849041/mean
+ 44.78%  log-loss 1.0438  X_lr_emb_1793849017/mean
+ 33.33%  log-loss 1.0986  HAN_1793849024/mean
+=== [4] previsões do test2 (3 famílias) e ensemble ===
+[info] 5 modelos encontrados: ['model_fold0', 'model_fold1', 'model_fold2', 'model_fold3', 'model_fold4']
+[info] NVIDIA GeForce RTX 3060: usando bf16 (Ampere+).
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights:  29%|██▉       | 113/393 [00:00<00:00, 1128.65it/s]Loading weights:  58%|█████▊    | 226/393 [00:00<00:00, 943.69it/s] Loading weights:  82%|████████▏ | 323/393 [00:00<00:00, 873.54it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 913.78it/s]
+[info] model_fold0: previsão feita
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights:  22%|██▏       | 86/393 [00:00<00:00, 850.31it/s]Loading weights:  44%|████▍     | 172/393 [00:00<00:00, 825.51it/s]Loading weights:  66%|██████▌   | 259/393 [00:00<00:00, 775.81it/s]Loading weights:  88%|████████▊ | 346/393 [00:00<00:00, 799.86it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 815.08it/s]
+[info] model_fold1: previsão feita
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights:  19%|█▉        | 74/393 [00:00<00:00, 728.46it/s]Loading weights:  42%|████▏     | 165/393 [00:00<00:00, 827.19it/s]Loading weights:  63%|██████▎   | 248/393 [00:00<00:00, 813.56it/s]Loading weights:  86%|████████▌ | 338/393 [00:00<00:00, 846.38it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 840.73it/s]
+[info] model_fold2: previsão feita
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights:  22%|██▏       | 86/393 [00:00<00:00, 839.97it/s]Loading weights:  44%|████▍     | 172/393 [00:00<00:00, 817.69it/s]Loading weights:  67%|██████▋   | 264/393 [00:00<00:00, 857.15it/s]Loading weights:  89%|████████▉ | 350/393 [00:00<00:00, 827.00it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 855.75it/s]
+[info] model_fold3: previsão feita
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights:  24%|██▎       | 93/393 [00:00<00:00, 917.85it/s]Loading weights:  47%|████▋     | 185/393 [00:00<00:00, 814.99it/s]Loading weights:  68%|██████▊   | 268/393 [00:00<00:00, 812.20it/s]Loading weights:  89%|████████▉ | 350/393 [00:00<00:00, 808.72it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 847.76it/s]
+[info] model_fold4: previsão feita
+submission_model.xlsx: {'c5': 0.414, 'c1': 0.307, 'c234': 0.28}
+submission_dupblend.xlsx (106 textos idênticos a algum do treino): {'c5': 0.415, 'c1': 0.313, 'c234': 0.272}
+[info] 5 modelos encontrados: ['model_fold0', 'model_fold1', 'model_fold2', 'model_fold3', 'model_fold4']
+[info] NVIDIA GeForce RTX 3060: usando bf16 (Ampere+).
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights:  44%|████▍     | 89/201 [00:00<00:00, 876.13it/s]Loading weights:  89%|████████▊ | 178/201 [00:00<00:00, 878.92it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 892.75it/s]
+[info] model_fold0: previsão feita
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights:  41%|████      | 82/201 [00:00<00:00, 807.77it/s]Loading weights:  82%|████████▏ | 165/201 [00:00<00:00, 810.11it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 871.34it/s]
+[info] model_fold1: previsão feita
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights:  41%|████▏     | 83/201 [00:00<00:00, 822.09it/s]Loading weights:  86%|████████▌ | 172/201 [00:00<00:00, 860.77it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 876.47it/s]
+[info] model_fold2: previsão feita
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights:  49%|████▉     | 98/201 [00:00<00:00, 895.68it/s]Loading weights:  94%|█████████▎| 188/201 [00:00<00:00, 851.24it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 899.05it/s]
+[info] model_fold3: previsão feita
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights:  45%|████▍     | 90/201 [00:00<00:00, 896.25it/s]Loading weights:  90%|████████▉ | 180/201 [00:00<00:00, 837.11it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 873.42it/s]
+[info] model_fold4: previsão feita
+submission_model.xlsx: {'c1': 0.398, 'c5': 0.346, 'c234': 0.256}
+submission_dupblend.xlsx (106 textos idênticos a algum do treino): {'c1': 0.389, 'c5': 0.352, 'c234': 0.259}
+[info] 5 modelos encontrados: ['model_fold0', 'model_fold1', 'model_fold2', 'model_fold3', 'model_fold4']
+[info] NVIDIA GeForce RTX 3060: usando bf16 (Ampere+).
+Loading weights:   0%|          | 0/174 [00:00<?, ?it/s]Loading weights:  44%|████▎     | 76/174 [00:00<00:00, 722.37it/s]Loading weights:  86%|████████▌ | 149/174 [00:00<00:00, 651.47it/s]Loading weights: 100%|██████████| 174/174 [00:00<00:00, 706.15it/s]
+[info] model_fold0: previsão feita
+Loading weights:   0%|          | 0/174 [00:00<?, ?it/s]Loading weights:  35%|███▌      | 61/174 [00:00<00:00, 598.24it/s]Loading weights:  70%|██████▉   | 121/174 [00:00<00:00, 571.26it/s]Loading weights: 100%|██████████| 174/174 [00:00<00:00, 624.18it/s]
+[info] model_fold1: previsão feita
+Loading weights:   0%|          | 0/174 [00:00<?, ?it/s]Loading weights:  28%|██▊       | 49/174 [00:00<00:00, 485.65it/s]Loading weights:  63%|██████▎   | 110/174 [00:00<00:00, 545.58it/s]Loading weights: 100%|██████████| 174/174 [00:00<00:00, 597.71it/s]
+[info] model_fold2: previsão feita
+Loading weights:   0%|          | 0/174 [00:00<?, ?it/s]Loading weights:  32%|███▏      | 55/174 [00:00<00:00, 529.64it/s]Loading weights:  68%|██████▊   | 119/174 [00:00<00:00, 593.01it/s]Loading weights: 100%|██████████| 174/174 [00:00<00:00, 598.98it/s]
+[info] model_fold3: previsão feita
+Loading weights:   0%|          | 0/174 [00:00<?, ?it/s]Loading weights:  22%|██▏       | 39/174 [00:00<00:00, 386.00it/s]Loading weights:  66%|██████▌   | 114/174 [00:00<00:00, 589.72it/s]Loading weights: 100%|██████████| 174/174 [00:00<00:00, 587.66it/s]
+[info] model_fold4: previsão feita
+submission_model.xlsx: {'c5': 0.371, 'c1': 0.318, 'c234': 0.311}
+submission_dupblend.xlsx (106 textos idênticos a algum do treino): {'c5': 0.373, 'c1': 0.324, 'c234': 0.302}
+[info] calculando membro tfidf_logreg (CPU; alguns minutos)...
+
+Modelos individuais (OOF):
+  final_large_1790601626                   acc=0.4554 macro-F1=0.4525 log-loss=1.0404
+  final_legal_1790612371                   acc=0.4558 macro-F1=0.4508 log-loss=1.0466
+  final_g_norb_lr3e-5_1790685940           acc=0.4585 macro-F1=0.4576 log-loss=1.0520
+  tfidf_logreg                             acc=0.4518 macro-F1=0.4508 log-loss=1.0426
+
+Comparação dos métodos de pesos (estimativa honesta, pesos ajustados só nos outros folds):
+  mean     acc=0.4721 log-loss=1.0201
+  logloss  acc=0.4734 log-loss=1.0189
+  grid     acc=0.4701 log-loss=1.0207
+  -> escolhido: logloss
+
+Pesos do ensemble (logloss): {'final_large_1790601626': 0.36, 'final_legal_1790612371': 0.19, 'final_g_norb_lr3e-5_1790685940': 0.11, 'tfidf_logreg': 0.34}
+Ensemble (OOF): acc=0.4735 macro-F1=0.4709 log-loss=1.0188
+  ESTIMATIVA HONESTA (pesos ajustados só nos outros folds): acc=0.4734 log-loss=1.0189  <- é esta a que você deve esperar no teste, não o número acima
+submission (modelo): {'c5': 0.399, 'c1': 0.32, 'c234': 0.281}
+submission (dupblend, 106 duplicatas): {'c5': 0.404, 'c1': 0.324, 'c234': 0.272}
+=== [5] confere o formato da entrega ===
+entrega_test2.xlsx linhas 897 897 | mesmas colunas: True | textos na mesma ordem: True | vazios: 0 | {'c5': 0.399, 'c1': 0.32, 'c234': 0.281}
+entrega_test2_dupblend.xlsx linhas 897 897 | mesmas colunas: True | textos na mesma ordem: True | vazios: 0 | {'c5': 0.404, 'c1': 0.324, 'c234': 0.272}
+=== FIM ===

@@ -110,6 +110,10 @@ def parse_args():
     p.add_argument("--no_grad_ckpt", action="store_true",
                    help="Desliga gradient checkpointing (mais rápido, mais VRAM).")
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--adam_beta2", type=float, default=0.98,
+                   help="beta2 do AdamW (0.98 = nosso padrão; 0.999 = padrão do PyTorch/HF).")
+    p.add_argument("--adam_eps", type=float, default=1e-6,
+                   help="eps do AdamW (1e-6 = nosso padrão; 1e-8 = padrão do PyTorch/HF).")
     p.add_argument("--optim_8bit", action="store_true",
                    help="Usa AdamW de 8 bits (biblioteca bitsandbytes) em vez do AdamW padrão. "
                         "Corta a memória do estado do otimizador em ~4x -- necessário para "
@@ -294,7 +298,7 @@ def setup_precision(torch):
 
 def param_groups(model, lr, wd, decay):
     """Layer-wise LR decay: camada do topo recebe lr, a de baixo lr*decay^k."""
-    pat = re.compile(r"\.layers?\.(\d+)\.")
+    pat = re.compile(r"\.(?:layers?|block)\.(\d+)\.")   # BERT/DeBERTa: .layer.N. | ModernBERT: .layers.N. | T5: .block.N.
     layer_ids = [int(m.group(1)) for n, _ in model.named_parameters() if (m := pat.search(n))]
     n_layers = max(layer_ids) + 1 if layer_ids else 0
     groups = {}
@@ -304,7 +308,7 @@ def param_groups(model, lr, wd, decay):
         m = pat.search(n)
         if m:
             depth = int(m.group(1)) + 1
-        elif "embed" in n:
+        elif "embed" in n or "shared" in n:
             depth = 0
         else:
             depth = n_layers + 1  # cabeça de classificação, pooler, norma final
@@ -318,8 +322,56 @@ def param_groups(model, lr, wd, decay):
     return list(groups.values())
 
 
+T5_TYPES = ("t5", "mt5", "umt5", "longt5")
+
+
+def build_t5_classifier(args, torch):
+    """PTT5 / T5: só o ENCODER + média dos vetores das palavras (ignorando padding) + camada linear.
+    Metade do custo do T5ForSequenceClassification (que roda encoder E decoder) e cabe inteiro na GPU
+    mesmo no 'large'. O objeto devolvido tem .logits, como os modelos do transformers."""
+    import torch.nn as nn
+    from types import SimpleNamespace
+    from transformers import T5EncoderModel
+
+    assert not args.lora, "--lora não é suportado para T5 (o encoder-only já cabe sem LoRA)."
+
+    class T5MeanPoolClassifier(nn.Module):
+        def __init__(self, enc, hidden):
+            super().__init__()
+            self.encoder_model = enc
+            self.drop = nn.Dropout(0.1)
+            self.classifier = nn.Linear(hidden, N_CLASSES)
+            nn.init.normal_(self.classifier.weight, std=0.02)
+            nn.init.zeros_(self.classifier.bias)
+
+        def forward(self, input_ids=None, attention_mask=None, **_):
+            h = self.encoder_model(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
+            m = attention_mask.unsqueeze(-1).to(h.dtype)
+            pooled = (h * m).sum(1).float() / m.sum(1).float().clamp(min=1.0)
+            return SimpleNamespace(logits=self.classifier(self.drop(pooled)))
+
+        def save_pretrained(self, path):  # (predict_v2.py NÃO lê este formato; as previsões do teste saem no treino)
+            path = Path(path)
+            path.mkdir(parents=True, exist_ok=True)
+            self.encoder_model.save_pretrained(path / "encoder")
+            torch.save(self.classifier.state_dict(), path / "classifier.pt")
+
+    try:
+        enc = T5EncoderModel.from_pretrained(args.model, use_safetensors=True)
+    except Exception as e:
+        print(f"[info] sem safetensors para {args.model} ({type(e).__name__}); tentando formato .bin")
+        enc = T5EncoderModel.from_pretrained(args.model)
+    if not args.no_grad_ckpt:
+        enc.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    print(f"[t5] encoder-only + média dos vetores | {sum(p.numel() for p in enc.parameters()) / 1e6:.0f}M parâmetros "
+          f"| d_model={enc.config.d_model}", flush=True)
+    return T5MeanPoolClassifier(enc, enc.config.d_model)
+
+
 def load_model(args, torch, amp_dtype=None):
-    from transformers import AutoModelForSequenceClassification
+    from transformers import AutoConfig, AutoModelForSequenceClassification
+    if AutoConfig.from_pretrained(args.model).model_type in T5_TYPES:
+        return build_t5_classifier(args, torch)
     kw = dict(num_labels=N_CLASSES, id2label=ID2LABEL, label2id=LABEL2ID)
     if args.lora and amp_dtype is not None:
         # base congelada em bf16: metade da memória, e ela não recebe atualização.
@@ -420,9 +472,9 @@ def train_fold(args, torch, tokenizer, train_seqs, soft, weights, val_seqs, y_va
     groups = param_groups(model, args.lr, args.weight_decay, args.llrd)
     if args.optim_8bit:
         import bitsandbytes as bnb
-        opt = bnb.optim.AdamW8bit(groups, lr=args.lr, betas=(0.9, 0.98), eps=1e-6)
+        opt = bnb.optim.AdamW8bit(groups, lr=args.lr, betas=(0.9, args.adam_beta2), eps=args.adam_eps)
     else:
-        opt = torch.optim.AdamW(groups, lr=args.lr, betas=(0.9, 0.98), eps=1e-6)
+        opt = torch.optim.AdamW(groups, lr=args.lr, betas=(0.9, args.adam_beta2), eps=args.adam_eps)
     lengths = [len(s) for s in train_seqs]
     steps_per_epoch = math.ceil(math.ceil(len(train_seqs) / args.batch_size) / args.grad_accum)
     total_steps = steps_per_epoch * args.epochs
