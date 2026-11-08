@@ -11,10 +11,6 @@ from sklearn.metrics import accuracy_score
 
 from data_utils import load_train
 
-# ============================================================
-# 1. CARREGAMENTO DOS DADOS
-# ============================================================
-
 df = load_train("train_limpo.xlsx")
 
 X = df["text"]
@@ -26,16 +22,10 @@ print(y.value_counts())
 print("\nTextos únicos:", X.nunique())
 
 
-# ============================================================
-# 2. GROUP K-FOLD
-# ============================================================
-
 n_splits = 3
 
 gkf = GroupKFold(n_splits=n_splits)
 
-# Mesma lógica de divisão utilizada em data_utils.py:
-# agrupamento pelo texto exato, sem embaralhamento.
 folds = list(gkf.split(df, groups=df["text"]))
 
 print(f"\nNúmero de folds: {len(folds)}")
@@ -47,8 +37,6 @@ for k, (train_idx, val_idx) in enumerate(folds):
         f"{len(val_idx)} exemplos de validação"
     )
 
-    # Verifica se algum texto aparece simultaneamente
-    # no treino e na validação.
     textos_treino = set(X.iloc[train_idx])
     textos_validacao = set(X.iloc[val_idx])
 
@@ -57,11 +45,6 @@ for k, (train_idx, val_idx) in enumerate(folds):
     assert len(intersecao) == 0, (
         f"Vazamento de dados no fold {k + 1}!"
     )
-
-
-# ============================================================
-# 3. GRID DE HIPERPARÂMETROS
-# ============================================================
 
 param_grid = [
     # TF-IDF por palavras
@@ -94,11 +77,6 @@ combinacoes = list(ParameterGrid(param_grid))
 print(f"\nTotal de combinações: {len(combinacoes)}")
 print(f"Total de treinamentos: {len(combinacoes) * n_splits}")
 
-
-# ============================================================
-# 4. GRID SEARCH MANUAL
-# ============================================================
-
 resultados = []
 
 inicio_total = time.time()
@@ -119,7 +97,6 @@ with open(arquivo_txt, "w", encoding="utf-8") as f:
 
         inicio_config = time.time()
 
-        # Representação dos parâmetros para salvar nos resultados.
         config = str(params)
 
         acuracias = []
@@ -128,36 +105,29 @@ with open(arquivo_txt, "w", encoding="utf-8") as f:
 
             inicio_fold = time.time()
 
-            # Separa treino e validação.
             X_train = X.iloc[train_idx]
             X_val = X.iloc[val_idx]
 
             y_train = y.iloc[train_idx]
             y_val = y.iloc[val_idx]
 
-            # Pipeline: TF-IDF + KNN.
             pipeline = Pipeline([
                 ("tfidf", TfidfVectorizer()),
                 ("knn", KNeighborsClassifier())
             ])
 
-            # Configura os hiperparâmetros.
             pipeline.set_params(**params)
 
-            # Treinamento.
             pipeline.fit(X_train, y_train)
 
-            # Predição.
             y_pred = pipeline.predict(X_val)
 
-            # Acurácia.
             acc = accuracy_score(y_val, y_pred)
 
             acuracias.append(acc)
 
             tempo_fold = time.time() - inicio_fold
 
-            # Guarda resultado individual do fold.
             resultados.append({
                 "configuracao": config,
                 "combinacao": i + 1,
@@ -166,7 +136,6 @@ with open(arquivo_txt, "w", encoding="utf-8") as f:
                 "tempo_segundos": tempo_fold
             })
 
-            # Registra imediatamente no TXT.
             mensagem = (
                 f"Combinação {i + 1}/{len(combinacoes)} | "
                 f"Fold {fold + 1}/{n_splits} | "
@@ -180,7 +149,6 @@ with open(arquivo_txt, "w", encoding="utf-8") as f:
             f.write(mensagem)
             f.flush()
 
-        # Média e desvio-padrão dos folds.
         media = np.mean(acuracias)
         desvio = np.std(acuracias)
 
@@ -200,20 +168,14 @@ with open(arquivo_txt, "w", encoding="utf-8") as f:
         f.flush()
 
 
-# ============================================================
-# 5. ORGANIZAÇÃO DOS RESULTADOS
-# ============================================================
-
 resultados_df = pd.DataFrame(resultados)
 
-# Resultados individuais de cada fold.
 resultados_df.to_csv(
     "resultados_knn_folds.csv",
     index=False,
     encoding="utf-8-sig"
 )
 
-# Resumo: média e desvio-padrão de cada combinação.
 resumo = (
     resultados_df
     .groupby(["combinacao", "configuracao"])
@@ -235,11 +197,6 @@ resumo.to_csv(
     index=False,
     encoding="utf-8-sig"
 )
-
-
-# ============================================================
-# 6. MELHOR CONFIGURAÇÃO
-# ============================================================
 
 melhor = resumo.iloc[0]
 
